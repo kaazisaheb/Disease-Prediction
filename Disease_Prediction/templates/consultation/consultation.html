@@ -1,0 +1,282 @@
+{% extends "basic.html" %}
+{% load static %}
+
+ 
+    {% block head %}
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block body %}
+
+
+
+<br><center><h2> Consultation</h2>
+</center>
+<br>
+
+
+
+<div class="row">
+
+
+<div class="col" >
+
+
+{% if user.patient.is_patient  %}
+  <div class="container ml-5 mr-5">
+          <button type="button" class="btn btn-outline-secondary" data-toggle="collapse" data-target="#demo">Give Rating and Reviews to Doctor {{consultation.doctor.name}}</button>
+                  <div id="demo" class="collapse">
+                      
+                    <form action="{% url 'rate_review' consultation.id %}" method="POST"> 
+                       {% csrf_token %}
+                        <div class="form-group mt-2">
+                                <label for="sel1">Rate (Out of 5):</label>
+                                <div class="row">
+                                  <div class="col-sm-2">
+                                      <select class="form-control" id="sel1" name="rating" > 
+                                   
+                                          <option>1</option>
+                                          <option>2</option>
+                                          <option>3</option>
+                                          <option>4</option>
+                                          <option>5</option>
+                                        </select>
+                                  </div>
+                                  <div class="col-sm-10">
+                                      <i class="material-icons" style="font-size:36px;color:yellow">star_half</i>
+                             
+                                  </div>
+                                </div>
+                               
+                              
+
+                                <br>
+                                <label for="comment">Reviews:</label>
+                                <textarea class="form-control" rows="5" id="comment" name="review"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+
+                  </div>
+
+  </div>
+    {% endif %}
+  <div class="container mt-4 ml-5 mr-5">
+          <button type="button" class="btn btn-outline-danger mb-4" data-toggle="collapse" data-target="#demo2">Close Consultation</button>
+          <div id="demo2" class="collapse">Are you sure to close consultation ?
+            <br>
+
+            <form action="{% url 'close_consultation' consultation.id %}" method="POST"> 
+              {% csrf_token %}
+            <button type="submit" class="btn btn-outline-success mr-2 mt-2" style="display:inline-block">Yes</button>
+         
+            <div class="btn btn-outline-danger mt-2"  data-toggle="collapse" >NO</div>
+          </form>
+          </div>
+      
+  </div>
+
+    
+
+
+
+
+
+
+    <div class="card mt-5 ml-5 mr-5 mb-5">
+                   
+        <div class="card-body">
+          <h4 class="card-title">Predicted disease : {{consultation.diseaseinfo.diseasename}}</h4>
+          <p class="card-text">List of symptoms - 
+
+              <ul class="list-group" >
+                {% for i in consultation.diseaseinfo.symptomsname %}
+                <li class="list-group-item" style="background-color:aliceblue">{{i}}</li>
+                {% endfor %}
+              </ul>
+        
+
+          </p>
+          <p class="card-text">Confident score - {{consultation.diseaseinfo.confidence}} %</p>
+          <p class="card-text">Patient age - {{consultation.patient.age}}</p>
+
+          <p class="card-text">Consultation date - {{consultation.consultation_date}}</p>
+          <p class="card-text" style="color: green;">Consultation status - {{consultation.status}}</p>
+        </div>
+        
+        
+    </div>
+
+
+<br>
+{% if user.doctor.is_doctor %}
+  <div class="container ml-5 mr-5">
+    <button type="button" class="btn btn-outline-secondary" data-toggle="collapse" data-target="#demo">Give Suggestions to Patient</button>
+    <div id="demo" class="collapse">
+      <form action="{% url 'give_suggestions' consultation.id %}" method="POST"> 
+        {% csrf_token %}
+        <div class="form-group mt-2">
+          <label for="suggestions">Suggestions:</label>
+          <textarea class="form-control" rows="5" id="suggestions" name="suggestions"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+{% endif %}
+
+
+
+    {% if user.patient.is_patient %}
+        
+    <div class="card mt-5 ml-5 mr-5 mb-5">
+      <h4 class="card-title">Suggestions from Doctor:</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Suggestions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if consultation.suggestions %}
+                    <tr>
+                        <td>{{ consultation.doctor.name }}</td>
+                        <td>{{ consultation.suggestions }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="2">No suggestions available</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+ 
+<br>
+ 
+
+                
+                            <div class="card mt-5 ml-5 mr-5 mb-5" >
+                                <div class="text-center " style="width:100px">
+                                    <img class="card-img-top " src="{% static 'homepage/patient.png' %}" alt="Card image" style="width:100%;">
+                                </div>
+                                <div class="card-body">
+                                  <h4 class="card-title">Patient name : {{consultation.patient.name}}</h4>
+                                  <p class="card-text">Patient ID - {{consultation.patient.user_id}}</p>
+                                  <p class="card-text">Patient email - {{consultation.patient.user.email}}</p>
+                                  <p class="card-text">patient phone no. - {{consultation.patient.mobile_no}}</p>
+                                  <a href="{% url 'pviewprofile' consultation.patient.user.username %}" class="btn btn-primary">View Profile</a>
+                                </div>
+                            </div>
+                
+                       
+                                <div class="card mt-5 ml-5 mr-5 mb-5" >
+                                        <div class="text-center " style="width:100px">
+                                            <img class="card-img-top" src="{% static 'homepage/doctor.png' %}" alt="Card image" style="width:100%;">
+                                        </div>
+                                        <div class="card-body" style="display: inline-block;">
+                                          <h4 class="card-title">Doctor name : {{consultation.doctor.name}}</h4>
+                                          <p class="card-text">Doctor ID - {{consultation.doctor.user_id}}</p>
+                                          <p class="card-text">Doctor email - {{consultation.doctor.user.email}}</p>
+                                          <p class="card-text">Doctor phone no. - {{consultation.doctor.mobile_no}}</p>
+                                          <p class="card-text">Doctor rating is - {{consultation.doctor.rating}}/5</p>
+                                          <a href="{% url 'dviewprofile' consultation.doctor.user.username %}" class="btn btn-primary">View Profile</a>
+                                        </div>
+                                </div>
+                        
+
+                                
+            
+<!--</div>        col 1 ends here................................................ -->
+                   
+    
+    
+        
+        
+        
+      <!-- <div class="col">
+
+        
+           
+            <div class="container-fluid border border-success rounded-lg" id="chat_window" style="background-color: #1423301a !important;">
+                        
+             
+                                <div id="chat-body" class="panel panel-default">
+                                    <center> <div class="panel-heading">Chat Box 
+                                             </div>  </center>
+
+                                    <div id="msg-list-div" class="panel-body">
+                                                <ul id="msg-list" class="list-group">
+
+
+                                          {% include 'consultation/chat_body.html' %}
+
+                      
+
+                                        <script>
+                                                var chatlist = document.getElementById('msg-list-div');
+                                                chatlist.scrollTop = chatlist.scrollHeight;
+                                        </script>
+                                                                                      
+                                                </ul>
+
+                                    </div>
+                                    <br>
+
+
+                                        <div id="chat-form" class="container-fluid">  {% csrf_token %}
+                                            <div id="chat-bottom" class="input-group">
+                                                
+                                                
+                                            <div>
+                                                    
+                                        </div>
+                                                
+                                               
+                                </div> 
+
+
+
+       
+
+                        
+
+             </div>  
+</div> --> <!-- col ends here................................................ -->
+
+
+
+  
+<!--</div> row ends here................................................ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
